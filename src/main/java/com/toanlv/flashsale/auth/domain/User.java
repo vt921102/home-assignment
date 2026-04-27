@@ -10,6 +10,8 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -29,6 +31,7 @@ import java.util.UUID;
                 columnList = "status"
         )
 )
+@Getter
 public class User {
 
     @Id
@@ -75,11 +78,11 @@ public class User {
             IdentifierType identifierType,
             String passwordHash) {
         var user = new User();
-        user.identifier     = identifier;
+        user.identifier = identifier;
         user.identifierType = identifierType;
-        user.passwordHash   = passwordHash;
-        user.status         = UserStatus.PENDING_VERIFICATION;
-        user.verified       = false;
+        user.passwordHash = passwordHash;
+        user.status = UserStatus.PENDING_VERIFICATION;
+        user.verified = false;
         return user;
     }
 
@@ -89,7 +92,7 @@ public class User {
 
     public void activate() {
         this.verified = true;
-        this.status   = UserStatus.ACTIVE;
+        this.status = UserStatus.ACTIVE;
     }
 
     public void updatePasswordHash(String passwordHash) {
@@ -100,18 +103,4 @@ public class User {
         return UserStatus.ACTIVE.equals(this.status) && this.verified;
     }
 
-    // ----------------------------------------------------------------
-    // Getters — no public setters on business fields
-    // ----------------------------------------------------------------
-
-    public UUID getId()                  { return id;             }
-    public String getIdentifier()        { return identifier;     }
-    public IdentifierType getIdentifierType() { return identifierType; }
-    public String getPasswordHash()      { return passwordHash;   }
-    public BigDecimal getBalance()       { return balance;        }
-    public UserStatus getStatus()        { return status;         }
-    public boolean isVerified()          { return verified;       }
-    public Long getVersion()             { return version;        }
-    public Instant getCreatedAt()        { return createdAt;      }
-    public Instant getUpdatedAt()        { return updatedAt;      }
 }

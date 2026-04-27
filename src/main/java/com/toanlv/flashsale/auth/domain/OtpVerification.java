@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Clock;
@@ -28,6 +29,7 @@ import java.util.UUID;
                 )
         }
 )
+@Getter
 public class OtpVerification {
 
     @Id
@@ -90,16 +92,4 @@ public class OtpVerification {
         return Instant.now(clock).isAfter(this.expiresAt);
     }
 
-    // ----------------------------------------------------------------
-    // Getters
-    // ----------------------------------------------------------------
-
-    public UUID getId()            { return id;           }
-    public UUID getUserId()        { return userId;       }
-    public String getCodeHash()    { return codeHash;     }
-    public OtpPurpose getPurpose() { return purpose;      }
-    public int getAttemptCount()   { return attemptCount; }
-    public boolean isUsed()        { return used;         }
-    public Instant getExpiresAt()  { return expiresAt;    }
-    public Instant getCreatedAt()  { return createdAt;    }
 }

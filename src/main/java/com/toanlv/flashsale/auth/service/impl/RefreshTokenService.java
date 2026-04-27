@@ -1,12 +1,14 @@
-package com.toanlv.flashsale.auth.service;
+package com.toanlv.flashsale.auth.service.impl;
 
 
 import com.toanlv.flashsale.auth.domain.RefreshToken;
 import com.toanlv.flashsale.auth.repository.RefreshTokenRepository;
+import com.toanlv.flashsale.auth.service.IRefreshTokenService;
 import com.toanlv.flashsale.common.exception.BusinessException;
 import com.toanlv.flashsale.common.exception.ErrorCode;
 import com.toanlv.flashsale.common.util.HashUtils;
 import com.toanlv.flashsale.common.config.ApplicationProperties;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Service
-public class RefreshTokenService {
+@RequiredArgsConstructor
+public class RefreshTokenService implements IRefreshTokenService {
 
     private static final Logger log =
             LoggerFactory.getLogger(RefreshTokenService.class);
@@ -26,19 +29,12 @@ public class RefreshTokenService {
     private final ApplicationProperties  properties;
     private final Clock clock;
 
-    public RefreshTokenService(
-            RefreshTokenRepository repository,
-            ApplicationProperties properties,
-            Clock clock) {
-        this.repository = repository;
-        this.properties = properties;
-        this.clock      = clock;
-    }
 
     /**
      * Issue a new refresh token for the user.
      * Returns the raw token — store hash in DB, return raw to client.
      */
+    @Override
     @Transactional
     public String issue(UUID userId) {
         var rawToken = UUID.randomUUID().toString();
@@ -61,6 +57,7 @@ public class RefreshTokenService {
      * @param rawToken the refresh token presented by the client
      * @return new raw refresh token
      */
+    @Override
     @Transactional
     public RotationResult rotate(String rawToken) {
         var hash  = HashUtils.hashRefreshToken(rawToken);
@@ -94,6 +91,7 @@ public class RefreshTokenService {
     /**
      * Revoke a single refresh token on logout.
      */
+    @Override
     @Transactional
     public void revoke(String rawToken) {
         var hash = HashUtils.hashRefreshToken(rawToken);

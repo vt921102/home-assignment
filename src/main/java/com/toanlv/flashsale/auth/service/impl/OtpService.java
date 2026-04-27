@@ -1,15 +1,17 @@
-package com.toanlv.flashsale.auth.service;
+package com.toanlv.flashsale.auth.service.impl;
 
 import com.toanlv.flashsale.auth.domain.IdentifierType;
 import com.toanlv.flashsale.auth.domain.OtpPurpose;
 import com.toanlv.flashsale.auth.domain.OtpVerification;
 import com.toanlv.flashsale.auth.repository.OtpVerificationRepository;
+import com.toanlv.flashsale.auth.service.IOtpService;
 import com.toanlv.flashsale.common.exception.BusinessException;
 import com.toanlv.flashsale.common.exception.ErrorCode;
 import com.toanlv.flashsale.common.outbox.service.OutboxPublisher;
 import com.toanlv.flashsale.common.security.RateLimitService;
 import com.toanlv.flashsale.common.util.HashUtils;
 import com.toanlv.flashsale.common.config.ApplicationProperties;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,8 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class OtpService {
+@RequiredArgsConstructor
+public class OtpService implements IOtpService {
 
     private static final Logger log =
             LoggerFactory.getLogger(OtpService.class);
@@ -33,21 +36,6 @@ public class OtpService {
     private final ApplicationProperties     properties;
     private final Clock                     clock;
 
-    public OtpService(
-            OtpVerificationRepository repository,
-            OutboxPublisher outboxPublisher,
-            OtpGenerator generator,
-            RateLimitService rateLimitService,
-            ApplicationProperties properties,
-            Clock clock) {
-        this.repository      = repository;
-        this.outboxPublisher = outboxPublisher;
-        this.generator       = generator;
-        this.rateLimitService = rateLimitService;
-        this.properties      = properties;
-        this.clock           = clock;
-    }
-
     /**
      * Issue a new OTP for the user.
      * Invalidates previous active OTPs for the same user+purpose.
@@ -56,6 +44,7 @@ public class OtpService {
      * Must be called within an active transaction
      * (OutboxPublisher requires Propagation.MANDATORY).
      */
+    @Override
     @Transactional
     public void issueOtp(
             UUID userId,
@@ -113,6 +102,7 @@ public class OtpService {
      * @param inputOtp raw OTP string from user
      * @throws BusinessException on any verification failure
      */
+    @Override
     @Transactional
     public void verifyOtp(
             UUID userId,

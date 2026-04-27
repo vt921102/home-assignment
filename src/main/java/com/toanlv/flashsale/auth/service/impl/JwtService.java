@@ -1,9 +1,11 @@
-package com.toanlv.flashsale.auth.service;
+package com.toanlv.flashsale.auth.service.impl;
 
 
+import com.toanlv.flashsale.auth.service.IJwtService;
 import com.toanlv.flashsale.common.config.ApplicationProperties;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
@@ -14,23 +16,13 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class JwtService {
+@RequiredArgsConstructor
+public class JwtService implements IJwtService {
 
     private final PrivateKey privateKey;
     private final JwtParser  jwtParser;
     private final ApplicationProperties properties;
     private final Clock clock;
-
-    public JwtService(
-            PrivateKey privateKey,
-            JwtParser jwtParser,
-            ApplicationProperties properties,
-            Clock clock) {
-        this.privateKey  = privateKey;
-        this.jwtParser   = jwtParser;
-        this.properties  = properties;
-        this.clock       = clock;
-    }
 
     /**
      * Issue a signed RS256 JWT access token.
@@ -43,6 +35,7 @@ public class JwtService {
      *   iat         — issued at
      *   exp         — expiry
      */
+    @Override
     public String issueAccessToken(
             UUID userId,
             String identifier,
@@ -68,6 +61,7 @@ public class JwtService {
      *
      * @throws io.jsonwebtoken.JwtException if token is invalid or expired
      */
+    @Override
     public UUID extractUserId(String token) {
         var subject = jwtParser
                 .parseSignedClaims(token)

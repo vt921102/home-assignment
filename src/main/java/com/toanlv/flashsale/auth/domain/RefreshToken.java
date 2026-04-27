@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
@@ -25,6 +26,7 @@ import java.util.UUID;
                 )
         }
 )
+@Getter
 public class RefreshToken {
 
     @Id
@@ -78,14 +80,4 @@ public class RefreshToken {
         return !this.revoked && !isExpired();
     }
 
-    // ----------------------------------------------------------------
-    // Getters
-    // ----------------------------------------------------------------
-
-    public UUID getId()           { return id;        }
-    public UUID getUserId()       { return userId;    }
-    public String getTokenHash()  { return tokenHash; }
-    public boolean isRevoked()    { return revoked;   }
-    public Instant getExpiresAt() { return expiresAt; }
-    public Instant getCreatedAt() { return createdAt; }
 }

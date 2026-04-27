@@ -1,4 +1,4 @@
-package com.toanlv.flashsale.auth.service;
+package com.toanlv.flashsale.auth.service.impl;
 
 import com.toanlv.flashsale.auth.domain.OtpPurpose;
 import com.toanlv.flashsale.auth.domain.User;
@@ -8,6 +8,10 @@ import com.toanlv.flashsale.auth.dto.LoginResponse;
 import com.toanlv.flashsale.auth.dto.RegisterRequest;
 import com.toanlv.flashsale.auth.dto.VerifyOtpRequest;
 import com.toanlv.flashsale.auth.repository.UserRepository;
+import com.toanlv.flashsale.auth.service.IAuthService;
+import com.toanlv.flashsale.auth.service.IJwtService;
+import com.toanlv.flashsale.auth.service.IOtpService;
+import com.toanlv.flashsale.auth.service.IRefreshTokenService;
 import com.toanlv.flashsale.auth.strategy.IdentifierDetector;
 import com.toanlv.flashsale.common.exception.BusinessException;
 import com.toanlv.flashsale.common.exception.ErrorCode;
@@ -19,7 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class AuthService {
+public class AuthService implements IAuthService {
 
     private static final Logger log =
             LoggerFactory.getLogger(AuthService.class);
@@ -27,11 +31,13 @@ public class AuthService {
     private static final String DEFAULT_ROLE = "USER";
 
     private final UserRepository        userRepository;
-    private final OtpService            otpService;
-    private final JwtService            jwtService;
-    private final RefreshTokenService   refreshTokenService;
+    private final IOtpService otpService;
+    private final IJwtService jwtService;
+    private final IRefreshTokenService refreshTokenService;
     private final IdentifierDetector    identifierDetector;
     private final PasswordEncoder       passwordEncoder;
+    // Lazy accessor to avoid circular injection
+    private ApplicationProperties properties;
 
     public AuthService(
             UserRepository userRepository,
@@ -66,6 +72,7 @@ public class AuthService {
      * Returns a generic message — does not reveal whether identifier
      * already exists (prevents user enumeration).
      */
+    @Override
     @Transactional
     public void register(RegisterRequest request) {
         var type       = identifierDetector.detect(request.identifier());
@@ -108,6 +115,7 @@ public class AuthService {
      *
      * Idempotent: if already verified, returns 200 without re-issuing tokens.
      */
+    @Override
     @Transactional
     public LoginResponse verifyOtp(VerifyOtpRequest request) {
         var type       = identifierDetector.detect(request.identifier());
@@ -148,6 +156,7 @@ public class AuthService {
      *     prevent user enumeration via timing differences
      *   - Generic error message — does not reveal why login failed
      */
+    @Override
     @Transactional
     public LoginResponse login(LoginRequest request) {
         var type       = identifierDetector.detect(request.identifier());
@@ -191,6 +200,7 @@ public class AuthService {
      * Revoke the presented refresh token.
      * Access token is short-lived (15 min) — no blocklist needed.
      */
+    @Override
     @Transactional
     public void logout(String rawRefreshToken) {
         refreshTokenService.revoke(rawRefreshToken);
@@ -204,6 +214,7 @@ public class AuthService {
      * Rotate refresh token and issue new access token.
      * Detects token reuse and revokes all sessions if detected.
      */
+    @Override
     @Transactional
     public LoginResponse refresh(String rawRefreshToken) {
         var result = refreshTokenService.rotate(rawRefreshToken);
@@ -228,6 +239,7 @@ public class AuthService {
      * Always returns success to prevent user enumeration —
      * even if identifier does not exist.
      */
+    @Override
     @Transactional
     public void resendOtp(String rawIdentifier) {
         var type       = identifierDetector.detect(rawIdentifier);
@@ -259,9 +271,7 @@ public class AuthService {
         return new LoginResponse(accessToken, refreshToken, ttlSeconds);
     }
 
-    // Lazy accessor to avoid circular injection
-    private com.toanlv.flashsale.common.config.ApplicationProperties properties;
-    private com.toanlv.flashsale.common.config.ApplicationProperties properties() {
+    private ApplicationProperties properties() {
         return properties;
     }
 

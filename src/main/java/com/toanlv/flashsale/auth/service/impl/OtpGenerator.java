@@ -1,13 +1,14 @@
-package com.toanlv.flashsale.auth.service;
+package com.toanlv.flashsale.auth.service.impl;
 
 
+import com.toanlv.flashsale.auth.service.IOtpGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
 
 @Component
-public class OtpGenerator {
+public class OtpGenerator implements IOtpGenerator {
 
     private final SecureRandom random = new SecureRandom();
     private final int length;
@@ -22,6 +23,7 @@ public class OtpGenerator {
      *
      * @return e.g. "034521" for length=6
      */
+    @Override
     public String generate() {
         int bound = (int) Math.pow(10, length);
         int n     = random.nextInt(bound);

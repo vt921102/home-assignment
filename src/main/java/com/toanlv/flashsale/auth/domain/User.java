@@ -1,0 +1,117 @@
+package com.toanlv.flashsale.auth.domain;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
+
+@Entity
+@Table(
+        name = "users",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_users_identifier",
+                columnNames = {"identifier", "identifier_type"}
+        ),
+        indexes = @Index(
+                name = "idx_users_status",
+                columnList = "status"
+        )
+)
+public class User {
+
+    @Id
+    @GeneratedValue
+    private UUID id;
+
+    @Column(nullable = false, length = 150)
+    private String identifier;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "identifier_type", nullable = false, length = 10)
+    private IdentifierType identifierType;
+
+    @Column(name = "password_hash", nullable = false, length = 60)
+    private String passwordHash;
+
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal balance = BigDecimal.ZERO;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private UserStatus status = UserStatus.PENDING_VERIFICATION;
+
+    @Column(name = "is_verified", nullable = false)
+    private boolean verified = false;
+
+    @Version
+    private Long version;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    // ----------------------------------------------------------------
+    // Factory
+    // ----------------------------------------------------------------
+
+    public static User create(
+            String identifier,
+            IdentifierType identifierType,
+            String passwordHash) {
+        var user = new User();
+        user.identifier     = identifier;
+        user.identifierType = identifierType;
+        user.passwordHash   = passwordHash;
+        user.status         = UserStatus.PENDING_VERIFICATION;
+        user.verified       = false;
+        return user;
+    }
+
+    // ----------------------------------------------------------------
+    // Business methods
+    // ----------------------------------------------------------------
+
+    public void activate() {
+        this.verified = true;
+        this.status   = UserStatus.ACTIVE;
+    }
+
+    public void updatePasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public boolean isActive() {
+        return UserStatus.ACTIVE.equals(this.status) && this.verified;
+    }
+
+    // ----------------------------------------------------------------
+    // Getters — no public setters on business fields
+    // ----------------------------------------------------------------
+
+    public UUID getId()                  { return id;             }
+    public String getIdentifier()        { return identifier;     }
+    public IdentifierType getIdentifierType() { return identifierType; }
+    public String getPasswordHash()      { return passwordHash;   }
+    public BigDecimal getBalance()       { return balance;        }
+    public UserStatus getStatus()        { return status;         }
+    public boolean isVerified()          { return verified;       }
+    public Long getVersion()             { return version;        }
+    public Instant getCreatedAt()        { return createdAt;      }
+    public Instant getUpdatedAt()        { return updatedAt;      }
+}

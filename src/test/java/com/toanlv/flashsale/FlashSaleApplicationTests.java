@@ -1,10 +1,10 @@
-package com.toanlv.homeassignment;
+package com.toanlv.flashsale;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class HomeAssignmentApplicationTests {
+class FlashSaleApplicationTests {
 
     @Test
     void contextLoads() {

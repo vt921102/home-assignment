@@ -1,0 +1,118 @@
+services:
+
+  # ============================================================
+  # Application
+  # ============================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: flash-sale-backend:latest
+    container_name: flash-sale-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/flashsale
+      DB_USERNAME: app
+      DB_PASSWORD: app_password
+      REDIS_HOST: redis
+      JWT_KEYSTORE_PATH: /app/keys/jwt.p12
+      JWT_KEYSTORE_PASSWORD: ${JWT_KEYSTORE_PASSWORD}
+      JWT_KEY_ALIAS: ${JWT_KEY_ALIAS:-jwt-signing}
+      OTP_HASH_PEPPER: ${OTP_HASH_PEPPER}
+    volumes:
+      - ./keys:/app/keys:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q",
+              "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - flash-sale-net
+
+  # ============================================================
+  # PostgreSQL
+  # ============================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: flash-sale-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: flashsale
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U app -d flashsale" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - flash-sale-net
+
+  # ============================================================
+  # Redis
+  # ============================================================
+  redis:
+    image: redis:7-alpine
+    container_name: flash-sale-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - flash-sale-net
+
+  # ============================================================
+  # Nginx — load balancer (multi-instance profile only)
+  # ============================================================
+  nginx:
+    image: nginx:alpine
+    container_name: flash-sale-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - flash-sale-net
+    profiles:
+      - multi-instance
+
+# ============================================================
+# Networks
+# ============================================================
+networks:
+  flash-sale-net:
+    driver: bridge
+
+# ============================================================
+# Volumes
+# ============================================================
+volumes:
+  pgdata:
+    driver: local
+  redisdata:
+    driver: local

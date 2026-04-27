@@ -1,0 +1,44 @@
+# src/test/resources/application-test.yml
+spring:
+  flyway:
+    locations:
+      - classpath:db/migration
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+app:
+  jwt:
+    issuer: flash-sale-test
+    access-token-ttl: PT15M
+    refresh-token-ttl: P7D
+    keystore-path: keys/jwt.p12
+    keystore-password: changeit
+    key-alias: jwt-signing
+  otp:
+    length: 6
+    ttl: PT5M
+    pepper: test-pepper-for-unit-tests
+    max-attempts: 5
+    resend-limit: 5
+    resend-window: PT1H
+  rate-limit:
+    login:    { limit: 5,  window: PT15M }
+    otp:      { limit: 5,  window: PT1H  }
+    purchase: { limit: 10, window: PT1M  }
+  flash-sale:
+    cache-ttl: PT2S
+    purchase-retry:
+      max-attempts: 3
+      initial-delay: PT0.05S
+      multiplier: 1.5
+  outbox:
+    poll-interval-ms: 1000

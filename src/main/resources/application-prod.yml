@@ -1,0 +1,6 @@
+spring:
+  flyway:
+    locations:
+      - classpath:db/migration
+    # V7__seed_dev_data.sql will be excluded
+    # because it is never run in prod baseline

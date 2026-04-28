@@ -1,5 +1,11 @@
 package com.toanlv.flashsale.auth.domain;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.util.UUID;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,87 +15,69 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Table(
-        name = "otp_verifications",
-        indexes = {
-                @Index(
-                        name = "idx_otp_active",
-                        columnList = "user_id, purpose"
-                ),
-                @Index(
-                        name = "idx_otp_expires",
-                        columnList = "expires_at"
-                )
-        }
-)
+    name = "otp_verifications",
+    indexes = {
+      @Index(name = "idx_otp_active", columnList = "user_id, purpose"),
+      @Index(name = "idx_otp_expires", columnList = "expires_at")
+    })
 @Getter
 public class OtpVerification {
 
-    @Id
-    @GeneratedValue
-    private UUID id;
+  @Id @GeneratedValue private UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+  @Column(name = "user_id", nullable = false)
+  private UUID userId;
 
-    @Column(name = "code_hash", nullable = false, length = 64)
-    private String codeHash;
+  @Column(name = "code_hash", nullable = false, length = 64)
+  private String codeHash;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    private OtpPurpose purpose;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 30)
+  private OtpPurpose purpose;
 
-    @Column(name = "attempt_count", nullable = false)
-    private int attemptCount = 0;
+  @Column(name = "attempt_count", nullable = false)
+  private int attemptCount = 0;
 
-    @Column(name = "is_used", nullable = false)
-    private boolean used = false;
+  @Column(name = "is_used", nullable = false)
+  private boolean used = false;
 
-    @Column(name = "expires_at", nullable = false)
-    private Instant expiresAt;
+  @Column(name = "expires_at", nullable = false)
+  private Instant expiresAt;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+  @CreationTimestamp
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
-    // ----------------------------------------------------------------
-    // Factory
-    // ----------------------------------------------------------------
+  // ----------------------------------------------------------------
+  // Factory
+  // ----------------------------------------------------------------
 
-    public static OtpVerification create(
-            UUID userId,
-            String codeHash,
-            OtpPurpose purpose,
-            Instant expiresAt) {
-        var otp = new OtpVerification();
-        otp.userId    = userId;
-        otp.codeHash  = codeHash;
-        otp.purpose   = purpose;
-        otp.expiresAt = expiresAt;
-        return otp;
-    }
+  public static OtpVerification create(
+      UUID userId, String codeHash, OtpPurpose purpose, Instant expiresAt) {
+    var otp = new OtpVerification();
+    otp.userId = userId;
+    otp.codeHash = codeHash;
+    otp.purpose = purpose;
+    otp.expiresAt = expiresAt;
+    return otp;
+  }
 
-    // ----------------------------------------------------------------
-    // Business methods
-    // ----------------------------------------------------------------
+  // ----------------------------------------------------------------
+  // Business methods
+  // ----------------------------------------------------------------
 
-    public void incrementAttempt() {
-        this.attemptCount++;
-    }
+  public void incrementAttempt() {
+    this.attemptCount++;
+  }
 
-    public void markUsed() {
-        this.used = true;
-    }
+  public void markUsed() {
+    this.used = true;
+  }
 
-    public boolean isExpired(Clock clock) {
-        return Instant.now(clock).isAfter(this.expiresAt);
-    }
-
+  public boolean isExpired(Clock clock) {
+    return Instant.now(clock).isAfter(this.expiresAt);
+  }
 }

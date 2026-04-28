@@ -5,8 +5,4 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record PurchaseResponse(
-        UUID       orderId,
-        BigDecimal amountPaid,
-        BigDecimal newBalance,
-        Instant    createdAt
-) {}
+    UUID orderId, BigDecimal amountPaid, BigDecimal newBalance, Instant createdAt) {}

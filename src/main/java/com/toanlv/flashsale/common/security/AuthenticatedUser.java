@@ -1,62 +1,56 @@
 package com.toanlv.flashsale.common.security;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-public record AuthenticatedUser(
-        UUID userId,
-        String identifier,
-        String role
-) implements UserDetails {
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-    public static AuthenticatedUser of(
-            UUID userId,
-            String identifier,
-            String role) {
-        return new AuthenticatedUser(userId, identifier, role);
-    }
+public record AuthenticatedUser(UUID userId, String identifier, String role)
+    implements UserDetails {
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
-    }
+  public static AuthenticatedUser of(UUID userId, String identifier, String role) {
+    return new AuthenticatedUser(userId, identifier, role);
+  }
 
-    @Override
-    public String getPassword() {
-        return null;
-    }
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of(new SimpleGrantedAuthority("ROLE_" + role));
+  }
 
-    @Override
-    public String getUsername() {
-        return identifier;
-    }
+  @Override
+  public String getPassword() {
+    return null;
+  }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+  @Override
+  public String getUsername() {
+    return identifier;
+  }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
 
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
 
-    public boolean isAdmin() {
-        return "ADMIN".equals(role);
-    }
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
+
+  public boolean isAdmin() {
+    return "ADMIN".equals(role);
+  }
 }

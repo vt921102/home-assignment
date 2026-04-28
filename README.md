@@ -201,7 +201,14 @@ src/main/java/com/toanlv/flashsale/
 │   │   ├── IdentifierType.java        # Enum: EMAIL | PHONE
 │   │   ├── OtpPurpose.java            # Enum: REGISTRATION | PASSWORD_RESET | LOGIN_2FA | CHANGE_IDENTIFIER
 │   │   └── UserStatus.java            # Enum: PENDING_VERIFICATION | ACTIVE | SUSPENDED | DELETED
-│   ├── dto/                           # Request/Response records
+│   ├── dto/
+│   │   ├── LoginRequest.java
+│   │   ├── LoginResponse.java
+│   │   ├── LogoutRequest.java
+│   │   ├── RefreshTokenRequest.java
+│   │   ├── RegisterRequest.java
+│   │   ├── ResendOtpRequest.java
+│   │   └── VerifyOtpRequest.java
 │   ├── outbox/
 │   │   └── OtpDispatchHandler.java    # Outbox handler for OTP_DISPATCH events
 │   ├── repository/
@@ -209,11 +216,17 @@ src/main/java/com/toanlv/flashsale/
 │   │   ├── OtpVerificationRepository.java  # + findActive, invalidateActive
 │   │   └── RefreshTokenRepository.java     # + findByTokenHash, revokeAllForUser
 │   ├── service/
-│   │   ├── AuthService.java           # register / verifyOtp / login / logout / refresh / resendOtp
-│   │   ├── JwtService.java            # issue / parse JWT (JJWT, PKCS12 keystore)
-│   │   ├── OtpService.java            # issueOtp / verifyOtp (rate-limit + constant-time compare)
-│   │   ├── OtpGenerator.java          # generate() → 6-digit string
-│   │   └── RefreshTokenService.java   # issue / rotate (reuse detection) / revoke
+│   │   ├── IAuthService.java
+│   │   ├── IJwtService.java
+│   │   ├── IOtpGenerator.java
+│   │   ├── IOtpService.java
+│   │   ├── IRefreshTokenService.java
+│   │   └── impl/
+│   │       ├── AuthService.java       # register / verifyOtp / login / logout / refresh / resendOtp
+│   │       ├── JwtService.java        # issue / parse JWT (JJWT, PKCS12 keystore)
+│   │       ├── OtpService.java        # issueOtp / verifyOtp (rate-limit + constant-time compare)
+│   │       ├── OtpGenerator.java      # generate() → 6-digit string
+│   │       └── RefreshTokenService.java  # issue / rotate (reuse detection) / revoke
 │   └── strategy/
 │       └── IdentifierDetector.java    # detect(email|phone) + normalize
 │
@@ -226,15 +239,26 @@ src/main/java/com/toanlv/flashsale/
 │   │   ├── FlashSaleSessionItem.java  # Entity: salePrice, totalQty, soldQty, @Version
 │   │   └── UserDailyPurchaseLimit.java # Entity: UNIQUE(userId, purchaseDate)
 │   ├── dto/
+│   │   ├── AddSessionItemRequest.java
+│   │   ├── CreateSessionRequest.java
+│   │   ├── FlashSaleItemDto.java
+│   │   ├── PurchaseRequest.java
+│   │   ├── PurchaseResponse.java
+│   │   └── SessionDto.java
 │   ├── repository/
 │   │   ├── FlashSaleSessionItemRepository.java  # + findByIdForPurchase (PESSIMISTIC_READ), decrementSold
 │   │   ├── FlashSaleSessionRepository.java
 │   │   └── UserDailyPurchaseLimitRepository.java # + insertIfAbsent (atomic INSERT OR NOTHING)
 │   ├── service/
-│   │   ├── PurchaseService.java       # purchase() + doPurchase() with retry + idempotency
-│   │   ├── FlashSaleQueryService.java # getCurrentItems() @Cacheable 2s
-│   │   ├── SessionAdminService.java   # createSession / addSessionItem
-│   │   └── IdempotencyService.java    # Redis cache lookup + store
+│   │   ├── IFlashSaleQueryService.java
+│   │   ├── IIdempotencyService.java
+│   │   ├── IPurchaseService.java
+│   │   ├── ISessionAdminService.java
+│   │   └── impl/
+│   │       ├── PurchaseService.java       # purchase() + doPurchase() with retry + idempotency
+│   │       ├── FlashSaleQueryService.java # getCurrentItems() @Cacheable 2s
+│   │       ├── SessionAdminService.java   # createSession / addSessionItem
+│   │       └── IdempotencyService.java    # Redis cache lookup + store
 │   └── strategy/
 │       ├── PurchaseEligibilityRule.java  # Sealed interface: check(PurchaseContext)
 │       ├── PurchaseContext.java          # Immutable record: userId, item, balance, clock
@@ -250,21 +274,29 @@ src/main/java/com/toanlv/flashsale/
 │   │   ├── Order.java                 # Entity: userId, status, totalAmount, idempotencyKey UNIQUE
 │   │   ├── OrderItem.java             # Entity: product snapshot, unitPrice, subtotal
 │   │   ├── OrderStatus.java           # Enum: PENDING | COMPLETED | FAILED | REFUNDED
-│   │   ├── BalanceTransaction.java    # Immutable audit log: amount, direction, reason, balance_after
-│   │   └── BalanceTransactionReason.java
+│   │   └── BalanceTransaction.java    # Immutable audit log: amount, direction, reason, balance_after
+│   ├── dto/
+│   │   ├── BalanceTransactionDto.java
+│   │   ├── OrderDto.java
+│   │   ├── OrderItemDto.java
+│   │   └── OrderSummaryDto.java
 │   ├── repository/
 │   │   ├── OrderRepository.java       # + findByUserId, findByIdempotencyKey
 │   │   └── BalanceTransactionRepository.java
 │   └── service/
-│       └── OrderService.java          # createFlashSaleOrder / query history
+│       ├── IOrderService.java
+│       └── impl/
+│           └── OrderService.java      # createFlashSaleOrder / query history
 │
 ├── inventory/                         # Inventory management bounded context
 │   ├── controller/
 │   │   └── InventoryAdminController.java  # GET /{productId}, POST /{productId}/restock
 │   ├── domain/
 │   │   ├── Inventory.java             # Entity: totalQty, reservedQty, availableQty, @Version
-│   │   ├── InventoryAuditLog.java     # Audit: source_event_id UNIQUE (idempotency guard)
-│   │   └── InventoryAuditReason.java
+│   │   └── InventoryAuditLog.java     # Audit: source_event_id UNIQUE (idempotency guard)
+│   ├── dto/
+│   │   ├── InventoryDto.java
+│   │   └── RestockRequest.java
 │   ├── outbox/
 │   │   ├── PurchaseSyncHandler.java   # Handles FLASH_SALE_PURCHASED events
 │   │   └── RestockSyncHandler.java    # Handles PRODUCT_RESTOCKED events
@@ -272,7 +304,9 @@ src/main/java/com/toanlv/flashsale/
 │   │   ├── InventoryRepository.java   # + decrementAvailable, incrementAvailable (atomic WHERE)
 │   │   └── InventoryAuditLogRepository.java
 │   ├── service/
-│   │   └── InventorySyncService.java  # handlePurchase / handleRestock / adminRestock / getInventory
+│   │   ├── IInventorySyncService.java
+│   │   └── impl/
+│   │       └── InventorySyncService.java  # handlePurchase / handleRestock / adminRestock / getInventory
 │   └── worker/
 │       ├── DeadLetterCleanupWorker.java   # Scheduled cleanup of dead-letter events
 │       └── ReconciliationWorker.java      # Periodic inventory reconciliation
@@ -285,22 +319,38 @@ src/main/java/com/toanlv/flashsale/
 │   │   ├── Product.java               # Entity: sku UNIQUE, name, basePrice, category, status
 │   │   ├── ProductCategory.java       # Self-referencing categories
 │   │   └── ProductStatus.java
+│   ├── dto/
+│   │   ├── CategoryDto.java
+│   │   ├── CreateCategoryRequest.java
+│   │   ├── CreateProductRequest.java
+│   │   ├── ProductDto.java
+│   │   └── UpdateProductRequest.java
 │   ├── repository/
 │   │   ├── ProductRepository.java
 │   │   └── CategoryRepository.java
 │   └── service/
-│       ├── ProductService.java
-│       └── CategoryService.java
+│       ├── ICategoryService.java
+│       ├── IProductService.java
+│       └── impl/
+│           ├── ProductService.java
+│           └── CategoryService.java
 │
-└── common/                            # Shared infrastructure
+├── config/                            # Application-wide Spring bean configuration
+│   ├── SecurityConfig.java            # SecurityFilterChain, CORS, filter ordering
+│   ├── JwtConfig.java                 # PKCS12 keystore → PrivateKey + PublicKey beans
+│   ├── CacheConfig.java               # Redis CacheManager
+│   ├── RedisConfig.java               # Lettuce connection factory, RedisTemplate
+│   ├── JpaConfig.java                 # JPA / Hibernate settings
+│   ├── AsyncConfig.java               # Virtual thread executor
+│   ├── SchedulingConfig.java          # Enables @Scheduled
+│   ├── ClockConfig.java               # Clock bean (system in prod, fixed in tests)
+│   ├── JacksonConfig.java             # ObjectMapper customization
+│   ├── OpenApiConfig.java             # Swagger / SpringDoc configuration
+│   └── WebConfig.java                 # MVC interceptors and formatters
+│
+└── common/                            # Shared infrastructure (no domain imports)
     ├── config/
-    │   ├── ApplicationProperties.java  # @ConfigurationProperties (jwt, otp, rateLimit, flashSale)
-    │   ├── SecurityConfig.java         # SecurityFilterChain, CORS, filter ordering
-    │   ├── JwtConfig.java              # PKCS12 keystore → PrivateKey + PublicKey beans
-    │   ├── CacheConfig.java            # Redis CacheManager
-    │   ├── ClockConfig.java            # Clock bean (fixed in tests, system clock in prod)
-    │   ├── AsyncConfig.java            # Virtual thread executor
-    │   └── SchedulingConfig.java       # Enables @Scheduled
+    │   └── ApplicationProperties.java  # @ConfigurationProperties (jwt, otp, rateLimit, flashSale)
     ├── exception/
     │   ├── BusinessException.java      # Runtime exception carrying ErrorCode
     │   ├── ErrorCode.java              # Enum: code + HTTP status + message
@@ -317,7 +367,9 @@ src/main/java/com/toanlv/flashsale/
     │   ├── repository/
     │   │   └── OutboxEventRepository.java  # + fetchPendingBatch (FOR UPDATE SKIP LOCKED)
     │   ├── service/
-    │   │   └── OutboxPublisher.java    # publish() @Transactional(MANDATORY)
+    │   │   ├── IOutboxPublisher.java
+    │   │   └── impl/
+    │   │       └── OutboxPublisher.java    # publish() @Transactional(MANDATORY)
     │   └── worker/
     │       └── OutboxDispatchWorker.java   # Scheduled poller with leader election
     ├── security/

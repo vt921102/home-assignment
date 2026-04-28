@@ -32,7 +32,7 @@ RUN addgroup -S app && adduser -S app -G app
 WORKDIR /app
 
 # Copy artifact from build stage
-COPY --from=build /build/target/flash-sale-backend.jar app.jar
+COPY --from=build /build/target/flash-sale.jar app.jar
 
 RUN chown -R app:app /app
 

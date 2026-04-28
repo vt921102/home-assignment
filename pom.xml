@@ -12,7 +12,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.toanle</groupId>
+    <groupId>com.toanlv</groupId>
     <artifactId>flash-sale</artifactId>
     <version>1.0.0</version>
     <name>flash-sale</name>

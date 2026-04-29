@@ -21,15 +21,30 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
   boolean existsBySku(String sku);
 
   /**
-   * Find active products with optional category filter and name search. Uses LEFT JOIN FETCH to
-   * avoid N+1 on category.
+   * Find products by filters with pagination.
+   *
+   * <p>JOIN FETCH removed — causes HHH90003004 warning with Pageable and is rejected by Spring Data
+   * JPA 3.5 strict sort validation. Category is loaded lazily per product when needed for DTO
+   * mapping.
+   *
+   * <p>countQuery provided explicitly to avoid Spring Data trying to derive count query from the
+   * main query.
    */
   @Query(
-      """
+      value =
+          """
             SELECT p FROM Product p
-            LEFT JOIN FETCH p.category c
             WHERE p.status = :status
-              AND (:categoryId IS NULL OR c.id = :categoryId)
+              AND (:categoryId IS NULL OR p.category.id = :categoryId)
+              AND (:search IS NULL
+                   OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))
+                   OR LOWER(p.sku)  LIKE LOWER(CONCAT('%', :search, '%')))
+            """,
+      countQuery =
+          """
+            SELECT COUNT(p) FROM Product p
+            WHERE p.status = :status
+              AND (:categoryId IS NULL OR p.category.id = :categoryId)
               AND (:search IS NULL
                    OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))
                    OR LOWER(p.sku)  LIKE LOWER(CONCAT('%', :search, '%')))
@@ -40,7 +55,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
       @Param("search") String search,
       Pageable pageable);
 
-  /** Find product by ID with category eagerly loaded. */
   @Query(
       """
             SELECT p FROM Product p

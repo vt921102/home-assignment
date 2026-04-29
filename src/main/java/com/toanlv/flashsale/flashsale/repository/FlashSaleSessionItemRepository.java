@@ -43,12 +43,12 @@ public interface FlashSaleSessionItemRepository extends JpaRepository<FlashSaleS
       @Param("date") LocalDate date, @Param("time") LocalTime time);
 
   /**
-   * Load a session item with its session and product for purchase. PESSIMISTIC_READ (shared lock)
-   * allows concurrent reads while preventing writes during the validation phase.
+   * Load a session item with its session and product for purchase. PESSIMISTIC_WRITE (exclusive
+   * lock) serializes concurrent purchases to guarantee correct version reads for decrementSold.
    *
    * <p>Lock timeout 3000ms — fail fast rather than queue threads.
    */
-  @Lock(LockModeType.PESSIMISTIC_READ)
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
   @QueryHints(@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000"))
   @Query(
       """

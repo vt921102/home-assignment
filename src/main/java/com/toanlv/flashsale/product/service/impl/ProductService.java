@@ -42,7 +42,10 @@ public class ProductService implements IProductService {
   @Cacheable(
       value = "product-catalog",
       key =
-          "#categoryId + ':' + #search + ':' + #pageable.pageNumber" + "+ ':' + #pageable.pageSize")
+          "T(String).valueOf(#categoryId) + ':'"
+              + "+ (#search ?: '') + ':'"
+              + "+ #pageable.pageNumber + ':'"
+              + "+ #pageable.pageSize")
   @Transactional(readOnly = true)
   public Page<ProductDto> findActive(UUID categoryId, String search, Pageable pageable) {
     return productRepository

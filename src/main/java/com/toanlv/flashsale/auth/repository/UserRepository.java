@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.toanlv.flashsale.auth.domain.IdentifierType;
 import com.toanlv.flashsale.auth.domain.User;
@@ -27,6 +28,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
    * @return 1 if updated, 0 if insufficient balance
    */
   @Modifying
+  @Transactional
   @Query(
       value =
           """

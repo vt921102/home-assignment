@@ -19,6 +19,7 @@ spring:
       auto-commit: false
 
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     properties:
@@ -30,6 +31,8 @@ spring:
         order_updates: true
         connection.provider_disables_autocommit: true
         format_sql: false
+        enable_lazy_load_no_trans: false
+
 
   flyway:
     enabled: true

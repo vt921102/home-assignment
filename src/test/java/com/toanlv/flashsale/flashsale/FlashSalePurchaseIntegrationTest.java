@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -34,6 +35,7 @@ import com.toanlv.flashsale.flashsale.repository.UserDailyPurchaseLimitRepositor
 import com.toanlv.flashsale.flashsale.service.IPurchaseService;
 import com.toanlv.flashsale.inventory.domain.Inventory;
 import com.toanlv.flashsale.inventory.repository.InventoryRepository;
+import com.toanlv.flashsale.order.repository.BalanceTransactionRepository;
 import com.toanlv.flashsale.order.repository.OrderRepository;
 import com.toanlv.flashsale.product.domain.Product;
 import com.toanlv.flashsale.product.domain.ProductCategory;
@@ -42,6 +44,7 @@ import com.toanlv.flashsale.product.repository.ProductRepository;
 
 @SpringBootTest
 @Testcontainers
+@ActiveProfiles("test")
 class FlashSalePurchaseIntegrationTest {
 
   @Container
@@ -68,6 +71,7 @@ class FlashSalePurchaseIntegrationTest {
   @Autowired FlashSaleSessionItemRepository itemRepository;
   @Autowired UserDailyPurchaseLimitRepository limitRepository;
   @Autowired OrderRepository orderRepository;
+  @Autowired BalanceTransactionRepository balanceTransactionRepository;
   @Autowired ProductRepository productRepository;
   @Autowired CategoryRepository categoryRepository;
   @Autowired InventoryRepository inventoryRepository;
@@ -76,13 +80,15 @@ class FlashSalePurchaseIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    // Clean state
+    // Clean state — order matches FK constraints
+    balanceTransactionRepository.deleteAll();
     orderRepository.deleteAll();
     limitRepository.deleteAll();
     itemRepository.deleteAll();
     sessionRepository.deleteAll();
     inventoryRepository.deleteAll();
     productRepository.deleteAll();
+    categoryRepository.deleteAll();
     userRepository.deleteAll();
 
     // Product

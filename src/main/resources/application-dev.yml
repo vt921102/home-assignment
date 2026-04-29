@@ -7,3 +7,5 @@ spring:
   flyway:
     locations:
       - classpath:db/migration
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}

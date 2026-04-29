@@ -10,6 +10,8 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
@@ -47,6 +49,8 @@ public class PurchaseService implements IPurchaseService {
   private final List<PurchaseEligibilityRule> rules;
   private final Clock clock;
   private final RetryTemplate retryTemplate;
+
+  @Lazy @Autowired private IPurchaseService self;
 
   public PurchaseService(
       FlashSaleSessionItemRepository itemRepository,
@@ -109,7 +113,7 @@ public class PurchaseService implements IPurchaseService {
       return cached.get();
     }
 
-    return retryTemplate.execute(ctx -> doPurchase(userId, sessionItemId, idempotencyKey));
+    return retryTemplate.execute(ctx -> self.doPurchase(userId, sessionItemId, idempotencyKey));
   }
 
   @Override

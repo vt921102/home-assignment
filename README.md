@@ -174,13 +174,18 @@ SPRING_PROFILES_ACTIVE=dev java -jar target/flash-sale-backend.jar
 |-------|-----------|
 | Runtime | Java 21, Spring Boot 3.5.14 |
 | Web | Spring MVC (virtual threads via Project Loom) |
-| Persistence | Spring Data JPA, Hibernate, Flyway (PostgreSQL) |
-| Caching / Locking | Redis (Lettuce), Redisson 3.34.1 |
+| Persistence | Spring Data JPA, Hibernate, Flyway, PostgreSQL 16 |
+| Caching / Locking | Redis 7 (Lettuce), Redisson 3.34.1 |
 | Security | Spring Security, JJWT 0.12.6 (RS256/PKCS12) |
+| Resilience | Spring Retry + AOP |
 | Messaging | Transactional Outbox (poll-based, in-process) |
-| API Docs | SpringDoc OpenAPI 2.6.0 |
+| API Docs | SpringDoc OpenAPI 2.8.14 |
 | Mapping | MapStruct 1.6.3 |
+| Code Generation | Lombok |
+| Nullability | JSpecify 1.0.0 |
 | Monitoring | Spring Actuator + Micrometer |
+| Infrastructure | Docker, Docker Compose, Nginx (load balancer) |
+| Code Quality | Spotless + Google Java Format 1.35.0 |
 | Testing | JUnit 5, Mockito, Testcontainers 1.20.4, ArchUnit 1.3.0 |
 
 ---

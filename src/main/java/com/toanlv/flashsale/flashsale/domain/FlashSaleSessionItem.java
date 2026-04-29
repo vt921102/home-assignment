@@ -16,7 +16,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(
     name = "flash_sale_session_items",
@@ -85,41 +87,5 @@ public class FlashSaleSessionItem {
 
   public int getRemainingQuantity() {
     return this.totalQuantity - this.soldQuantity;
-  }
-
-  // ----------------------------------------------------------------
-  // Getters
-  // ----------------------------------------------------------------
-
-  public UUID getId() {
-    return id;
-  }
-
-  public FlashSaleSession getSession() {
-    return session;
-  }
-
-  public Product getProduct() {
-    return product;
-  }
-
-  public BigDecimal getSalePrice() {
-    return salePrice;
-  }
-
-  public int getTotalQuantity() {
-    return totalQuantity;
-  }
-
-  public int getSoldQuantity() {
-    return soldQuantity;
-  }
-
-  public int getPerUserLimit() {
-    return perUserLimit;
-  }
-
-  public Long getVersion() {
-    return version;
   }
 }

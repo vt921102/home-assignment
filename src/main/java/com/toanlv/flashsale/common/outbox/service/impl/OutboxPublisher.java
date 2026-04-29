@@ -11,6 +11,8 @@ import com.toanlv.flashsale.common.outbox.domain.OutboxEvent;
 import com.toanlv.flashsale.common.outbox.repository.OutboxEventRepository;
 import com.toanlv.flashsale.common.outbox.service.IOutboxPublisher;
 
+import lombok.RequiredArgsConstructor;
+
 /// Transactional outbox publisher.
 /// Publishes events into the outbox_events table within the caller's
 /// existing transaction. This guarantees that the business state change
@@ -24,13 +26,10 @@ import com.toanlv.flashsale.common.outbox.service.IOutboxPublisher;
 ///   rather than silently publishing an event without a surrounding transaction,
 ///   which could lead to events without corresponding business data.
 @Service
+@RequiredArgsConstructor
 public class OutboxPublisher implements IOutboxPublisher {
 
   private final OutboxEventRepository repository;
-
-  public OutboxPublisher(OutboxEventRepository repository) {
-    this.repository = repository;
-  }
 
   /**
    * Publish an outbox event within the current transaction.
@@ -41,8 +40,8 @@ public class OutboxPublisher implements IOutboxPublisher {
    * @param payload event-specific data
    * @return ID of the saved outbox event
    */
-  @Transactional(propagation = Propagation.MANDATORY)
   @Override
+  @Transactional(propagation = Propagation.MANDATORY)
   public UUID publish(
       String eventType, String aggregateType, UUID aggregateId, Map<String, Object> payload) {
 

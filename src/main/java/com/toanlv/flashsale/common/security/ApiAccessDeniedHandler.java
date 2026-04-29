@@ -14,19 +14,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Returns 403 JSON response when authenticated user lacks required role. Example: USER role
  * accessing /api/v1/admin/** endpoints.
  */
 @Component
+@RequiredArgsConstructor
 public class ApiAccessDeniedHandler implements AccessDeniedHandler {
 
   private final ObjectMapper objectMapper;
-
-  public ApiAccessDeniedHandler(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-  }
 
   @Override
   public void handle(

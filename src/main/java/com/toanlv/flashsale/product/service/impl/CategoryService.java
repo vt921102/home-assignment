@@ -1,5 +1,6 @@
 package com.toanlv.flashsale.product.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ public class CategoryService implements ICategoryService {
   @Cacheable("category-tree")
   @Transactional(readOnly = true)
   public List<CategoryDto> findAll() {
-    return repository.findAllWithParent().stream().map(CategoryDto::from).toList();
+    return new ArrayList<>(repository.findAllWithParent().stream().map(CategoryDto::from).toList());
   }
 
   @Override

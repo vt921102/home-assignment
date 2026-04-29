@@ -14,7 +14,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(
     name = "balance_transactions",
@@ -80,41 +82,5 @@ public class BalanceTransaction {
     tx.balanceAfter = balanceAfter;
     tx.reason = reason;
     return tx;
-  }
-
-  // ----------------------------------------------------------------
-  // Getters
-  // ----------------------------------------------------------------
-
-  public UUID getId() {
-    return id;
-  }
-
-  public UUID getUserId() {
-    return userId;
-  }
-
-  public UUID getOrderId() {
-    return orderId;
-  }
-
-  public BigDecimal getAmount() {
-    return amount;
-  }
-
-  public Direction getDirection() {
-    return direction;
-  }
-
-  public BigDecimal getBalanceAfter() {
-    return balanceAfter;
-  }
-
-  public String getReason() {
-    return reason;
-  }
-
-  public Instant getCreatedAt() {
-    return createdAt;
   }
 }

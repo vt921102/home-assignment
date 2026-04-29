@@ -33,8 +33,8 @@ public class RefreshTokenService implements IRefreshTokenService {
    * Issue a new refresh token for the user. Returns the raw token — store hash in DB, return raw to
    * client.
    */
-  @Transactional
   @Override
+  @Transactional
   public String issue(UUID userId) {
     var rawToken = UUID.randomUUID().toString();
     var hash = HashUtils.hashRefreshToken(rawToken);
@@ -54,8 +54,8 @@ public class RefreshTokenService implements IRefreshTokenService {
    * @param rawToken the refresh token presented by the client
    * @return new raw refresh token
    */
-  @Transactional
   @Override
+  @Transactional
   public RotationResult rotate(String rawToken) {
     var hash = HashUtils.hashRefreshToken(rawToken);
     var token =
@@ -87,8 +87,8 @@ public class RefreshTokenService implements IRefreshTokenService {
   }
 
   /** Revoke a single refresh token on logout. */
-  @Transactional
   @Override
+  @Transactional
   public void revoke(String rawToken) {
     var hash = HashUtils.hashRefreshToken(rawToken);
     repository

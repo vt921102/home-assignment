@@ -20,8 +20,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
   private static final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
@@ -30,10 +32,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   private static final String BEARER_PREFIX = "Bearer ";
 
   private final JwtParser jwtParser;
-
-  public JwtAuthFilter(JwtParser jwtParser) {
-    this.jwtParser = jwtParser;
-  }
 
   @Override
   protected void doFilterInternal(

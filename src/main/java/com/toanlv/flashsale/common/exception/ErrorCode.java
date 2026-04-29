@@ -2,6 +2,9 @@ package com.toanlv.flashsale.common.exception;
 
 import org.springframework.http.HttpStatus;
 
+import lombok.Getter;
+
+@Getter
 public enum ErrorCode {
 
   // ----------------------------------------------------------------
@@ -93,17 +96,5 @@ public enum ErrorCode {
     this.code = code;
     this.message = message;
     this.httpStatus = httpStatus;
-  }
-
-  public int getCode() {
-    return code;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public HttpStatus getHttpStatus() {
-    return httpStatus;
   }
 }

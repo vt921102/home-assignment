@@ -14,7 +14,9 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(
     name = "product_categories",
@@ -43,25 +45,5 @@ public class ProductCategory {
     category.name = name;
     category.parent = parent;
     return category;
-  }
-
-  // ----------------------------------------------------------------
-  // Getters
-  // ----------------------------------------------------------------
-
-  public UUID getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public ProductCategory getParent() {
-    return parent;
-  }
-
-  public Instant getCreatedAt() {
-    return createdAt;
   }
 }

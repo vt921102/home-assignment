@@ -12,7 +12,9 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(
     name = "order_items",
@@ -76,41 +78,5 @@ public class OrderItem {
 
   void assignOrder(Order order) {
     this.order = order;
-  }
-
-  // ----------------------------------------------------------------
-  // Getters
-  // ----------------------------------------------------------------
-
-  public UUID getId() {
-    return id;
-  }
-
-  public Order getOrder() {
-    return order;
-  }
-
-  public UUID getProductId() {
-    return productId;
-  }
-
-  public String getProductName() {
-    return productName;
-  }
-
-  public int getQuantity() {
-    return quantity;
-  }
-
-  public BigDecimal getUnitPrice() {
-    return unitPrice;
-  }
-
-  public BigDecimal getSubtotal() {
-    return subtotal;
-  }
-
-  public UUID getSourceRefId() {
-    return sourceRefId;
   }
 }

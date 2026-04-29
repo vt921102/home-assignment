@@ -45,8 +45,8 @@ public class OtpService implements IOtpService {
    * <p>Must be called within an active transaction (OutboxPublisher requires
    * Propagation.MANDATORY).
    */
-  @Transactional
   @Override
+  @Transactional
   public void issueOtp(UUID userId, OtpPurpose purpose, IdentifierType channel, String identifier) {
 
     var cfg = properties.otp();
@@ -91,8 +91,8 @@ public class OtpService implements IOtpService {
    * @param inputOtp raw OTP string from user
    * @throws BusinessException on any verification failure
    */
-  @Transactional
   @Override
+  @Transactional
   public void verifyOtp(UUID userId, OtpPurpose purpose, String inputOtp) {
 
     var cfg = properties.otp();

@@ -23,8 +23,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class IdempotencyFilter extends OncePerRequestFilter {
 
   private static final Logger log = LoggerFactory.getLogger(IdempotencyFilter.class);
@@ -39,15 +41,6 @@ public class IdempotencyFilter extends OncePerRequestFilter {
   private final StringRedisTemplate redisTemplate;
   private final ApplicationProperties properties;
   private final ObjectMapper objectMapper;
-
-  public IdempotencyFilter(
-      StringRedisTemplate redisTemplate,
-      ApplicationProperties properties,
-      ObjectMapper objectMapper) {
-    this.redisTemplate = redisTemplate;
-    this.properties = properties;
-    this.objectMapper = objectMapper;
-  }
 
   @Override
   protected void doFilterInternal(
@@ -140,6 +133,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
       java.util.UUID.fromString(value);
       return true;
     } catch (IllegalArgumentException e) {
+      log.warn(e.getMessage());
       return false;
     }
   }

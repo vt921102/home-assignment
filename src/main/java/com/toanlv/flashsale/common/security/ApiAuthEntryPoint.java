@@ -14,19 +14,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Returns 401 JSON response when unauthenticated request hits a protected endpoint. Prevents Spring
  * Security default redirect to /login.
  */
 @Component
+@RequiredArgsConstructor
 public class ApiAuthEntryPoint implements AuthenticationEntryPoint {
 
   private final ObjectMapper objectMapper;
-
-  public ApiAuthEntryPoint(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-  }
 
   @Override
   public void commence(

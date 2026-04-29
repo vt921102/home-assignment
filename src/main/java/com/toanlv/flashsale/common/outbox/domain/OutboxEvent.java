@@ -16,7 +16,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(
     name = "outbox_events",
@@ -113,49 +115,5 @@ public class OutboxEvent {
    */
   public boolean isExhausted(int maxAttempts) {
     return this.retryCount >= maxAttempts;
-  }
-
-  // ----------------------------------------------------------------
-  // Getters — no setters on business fields, use factory + methods
-  // ----------------------------------------------------------------
-
-  public UUID getId() {
-    return id;
-  }
-
-  public String getEventType() {
-    return eventType;
-  }
-
-  public String getAggregateType() {
-    return aggregateType;
-  }
-
-  public UUID getAggregateId() {
-    return aggregateId;
-  }
-
-  public Map<String, Object> getPayload() {
-    return payload;
-  }
-
-  public OutboxStatus getStatus() {
-    return status;
-  }
-
-  public int getRetryCount() {
-    return retryCount;
-  }
-
-  public Instant getNextRetryAt() {
-    return nextRetryAt;
-  }
-
-  public Instant getCreatedAt() {
-    return createdAt;
-  }
-
-  public Instant getProcessedAt() {
-    return processedAt;
   }
 }

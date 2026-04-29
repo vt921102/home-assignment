@@ -16,22 +16,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class RateLimitFilter extends OncePerRequestFilter {
 
   private final RateLimitService rateLimitService;
   private final ApplicationProperties properties;
   private final ObjectMapper objectMapper;
-
-  public RateLimitFilter(
-      RateLimitService rateLimitService,
-      ApplicationProperties properties,
-      ObjectMapper objectMapper) {
-    this.rateLimitService = rateLimitService;
-    this.properties = properties;
-    this.objectMapper = objectMapper;
-  }
 
   @Override
   protected void doFilterInternal(

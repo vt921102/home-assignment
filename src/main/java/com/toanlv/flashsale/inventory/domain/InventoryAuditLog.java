@@ -12,7 +12,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(
     name = "inventory_audit_logs",
@@ -59,33 +61,5 @@ public class InventoryAuditLog {
     log.delta = delta;
     log.reason = reason;
     return log;
-  }
-
-  // ----------------------------------------------------------------
-  // Getters
-  // ----------------------------------------------------------------
-
-  public UUID getId() {
-    return id;
-  }
-
-  public UUID getProductId() {
-    return productId;
-  }
-
-  public UUID getSourceEventId() {
-    return sourceEventId;
-  }
-
-  public int getDelta() {
-    return delta;
-  }
-
-  public String getReason() {
-    return reason;
-  }
-
-  public Instant getCreatedAt() {
-    return createdAt;
   }
 }

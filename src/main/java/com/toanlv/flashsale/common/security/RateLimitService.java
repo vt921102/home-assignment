@@ -8,7 +8,10 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class RateLimitService {
 
   /**
@@ -33,10 +36,6 @@ public class RateLimitService {
             """;
 
   private final RedissonClient redisson;
-
-  public RateLimitService(RedissonClient redisson) {
-    this.redisson = redisson;
-  }
 
   /**
    * @return true if request is allowed, false if rate limit exceeded

@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
 @Entity
 @Table(
@@ -27,20 +28,25 @@ import jakarta.persistence.Table;
         @Index(name = "idx_flash_sale_sessions_active_date", columnList = "sale_date, is_active"))
 public class FlashSaleSession {
 
-  @Id @GeneratedValue private UUID id;
+  @Getter @Id @GeneratedValue private UUID id;
 
+  @Getter
   @Column(nullable = false, length = 100)
   private String name;
 
+  @Getter
   @Column(name = "sale_date", nullable = false)
   private LocalDate saleDate;
 
+  @Getter
   @Column(name = "start_time", nullable = false)
   private LocalTime startTime;
 
+  @Getter
   @Column(name = "end_time", nullable = false)
   private LocalTime endTime;
 
+  @Getter
   @Column(name = "is_active", nullable = false)
   private boolean active = true;
 
@@ -51,6 +57,7 @@ public class FlashSaleSession {
       fetch = FetchType.LAZY)
   private List<FlashSaleSessionItem> items = new ArrayList<>();
 
+  @Getter
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
@@ -89,39 +96,7 @@ public class FlashSaleSession {
         && time.isBefore(this.endTime);
   }
 
-  // ----------------------------------------------------------------
-  // Getters
-  // ----------------------------------------------------------------
-
-  public UUID getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public LocalDate getSaleDate() {
-    return saleDate;
-  }
-
-  public LocalTime getStartTime() {
-    return startTime;
-  }
-
-  public LocalTime getEndTime() {
-    return endTime;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
   public List<FlashSaleSessionItem> getItems() {
     return Collections.unmodifiableList(items);
-  }
-
-  public Instant getCreatedAt() {
-    return createdAt;
   }
 }

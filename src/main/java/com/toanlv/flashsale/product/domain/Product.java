@@ -19,7 +19,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(
     name = "products",
@@ -109,53 +111,5 @@ public class Product {
 
   public boolean isActive() {
     return ProductStatus.ACTIVE.equals(this.status);
-  }
-
-  // ----------------------------------------------------------------
-  // Getters
-  // ----------------------------------------------------------------
-
-  public UUID getId() {
-    return id;
-  }
-
-  public String getSku() {
-    return sku;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public BigDecimal getBasePrice() {
-    return basePrice;
-  }
-
-  public String getImageUrl() {
-    return imageUrl;
-  }
-
-  public ProductCategory getCategory() {
-    return category;
-  }
-
-  public ProductStatus getStatus() {
-    return status;
-  }
-
-  public Long getVersion() {
-    return version;
-  }
-
-  public Instant getCreatedAt() {
-    return createdAt;
-  }
-
-  public Instant getUpdatedAt() {
-    return updatedAt;
   }
 }

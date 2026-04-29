@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.toanlv.flashsale.common.exception.BusinessException;
 import com.toanlv.flashsale.common.exception.ErrorCode;
+import com.toanlv.flashsale.common.util.PageImplBean;
 import com.toanlv.flashsale.inventory.domain.Inventory;
 import com.toanlv.flashsale.inventory.repository.InventoryRepository;
 import com.toanlv.flashsale.product.domain.Product;
@@ -42,15 +43,13 @@ public class ProductService implements IProductService {
   @Cacheable(
       value = "product-catalog",
       key =
-          "T(String).valueOf(#categoryId) + ':'"
-              + "+ (#search ?: '') + ':'"
-              + "+ #pageable.pageNumber + ':'"
-              + "+ #pageable.pageSize")
+          "'' + #categoryId + ':' + (#search ?: '') + ':' + #pageable.pageNumber + ':' + #pageable.pageSize")
   @Transactional(readOnly = true)
   public Page<ProductDto> findActive(UUID categoryId, String search, Pageable pageable) {
-    return productRepository
-        .findByFilters(ProductStatus.ACTIVE, categoryId, search, pageable)
-        .map(ProductDto::from);
+    return new PageImplBean<>(
+        productRepository
+            .findByFilters(ProductStatus.ACTIVE, categoryId, search, pageable)
+            .map(ProductDto::from));
   }
 
   // ----------------------------------------------------------------

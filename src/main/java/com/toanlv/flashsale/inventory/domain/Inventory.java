@@ -12,7 +12,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
+import lombok.Getter;
 
+@Getter
 @Entity
 @Table(
     name = "inventories",
@@ -150,37 +152,5 @@ public class Inventory {
         && this.availableQuantity >= 0
         && this.reservedQuantity >= 0
         && this.totalQuantity >= 0;
-  }
-
-  // ----------------------------------------------------------------
-  // Getters
-  // ----------------------------------------------------------------
-
-  public UUID getId() {
-    return id;
-  }
-
-  public UUID getProductId() {
-    return productId;
-  }
-
-  public int getTotalQuantity() {
-    return totalQuantity;
-  }
-
-  public int getReservedQuantity() {
-    return reservedQuantity;
-  }
-
-  public int getAvailableQuantity() {
-    return availableQuantity;
-  }
-
-  public Long getVersion() {
-    return version;
-  }
-
-  public Instant getUpdatedAt() {
-    return updatedAt;
   }
 }

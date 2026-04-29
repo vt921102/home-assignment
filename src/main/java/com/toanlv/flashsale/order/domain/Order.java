@@ -23,6 +23,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
+import lombok.Getter;
 
 @Entity
 @Table(
@@ -35,21 +36,26 @@ import jakarta.persistence.Version;
     })
 public class Order {
 
-  @Id @GeneratedValue private UUID id;
+  @Getter @Id @GeneratedValue private UUID id;
 
+  @Getter
   @Column(name = "user_id", nullable = false)
   private UUID userId;
 
+  @Getter
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
   private OrderStatus status = OrderStatus.PENDING;
 
+  @Getter
   @Column(name = "total_amount", nullable = false, precision = 19, scale = 2)
   private BigDecimal totalAmount;
 
+  @Getter
   @Column(name = "idempotency_key", nullable = false, unique = true, length = 100)
   private String idempotencyKey;
 
+  @Getter
   @Column(name = "order_type", nullable = false, length = 20)
   private String orderType;
 
@@ -60,12 +66,14 @@ public class Order {
       fetch = FetchType.LAZY)
   private List<OrderItem> items = new ArrayList<>();
 
-  @Version private Long version;
+  @Getter @Version private Long version;
 
+  @Getter
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
   private Instant createdAt;
 
+  @Getter
   @UpdateTimestamp
   @Column(name = "updated_at", nullable = false)
   private Instant updatedAt;
@@ -122,43 +130,7 @@ public class Order {
   // Getters
   // ----------------------------------------------------------------
 
-  public UUID getId() {
-    return id;
-  }
-
-  public UUID getUserId() {
-    return userId;
-  }
-
-  public OrderStatus getStatus() {
-    return status;
-  }
-
-  public BigDecimal getTotalAmount() {
-    return totalAmount;
-  }
-
-  public String getIdempotencyKey() {
-    return idempotencyKey;
-  }
-
-  public String getOrderType() {
-    return orderType;
-  }
-
   public List<OrderItem> getItems() {
     return Collections.unmodifiableList(items);
-  }
-
-  public Long getVersion() {
-    return version;
-  }
-
-  public Instant getCreatedAt() {
-    return createdAt;
-  }
-
-  public Instant getUpdatedAt() {
-    return updatedAt;
   }
 }

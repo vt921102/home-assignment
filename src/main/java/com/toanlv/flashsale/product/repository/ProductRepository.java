@@ -36,18 +36,18 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             SELECT p FROM Product p
             WHERE p.status = :status
               AND (:categoryId IS NULL OR p.category.id = :categoryId)
-              AND (:search IS NULL
-                   OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))
-                   OR LOWER(p.sku)  LIKE LOWER(CONCAT('%', :search, '%')))
+              AND (CAST(:search AS String) IS NULL
+                   OR LOWER(p.name) LIKE LOWER(CONCAT('%', CAST(:search AS String), '%'))
+                   OR LOWER(p.sku)  LIKE LOWER(CONCAT('%', CAST(:search AS String), '%')))
             """,
       countQuery =
           """
             SELECT COUNT(p) FROM Product p
             WHERE p.status = :status
               AND (:categoryId IS NULL OR p.category.id = :categoryId)
-              AND (:search IS NULL
-                   OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))
-                   OR LOWER(p.sku)  LIKE LOWER(CONCAT('%', :search, '%')))
+              AND (CAST(:search AS String) IS NULL
+                   OR LOWER(p.name) LIKE LOWER(CONCAT('%', CAST(:search AS String), '%'))
+                   OR LOWER(p.sku)  LIKE LOWER(CONCAT('%', CAST(:search AS String), '%')))
             """)
   Page<Product> findByFilters(
       @Param("status") ProductStatus status,

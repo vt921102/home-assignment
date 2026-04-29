@@ -28,8 +28,6 @@ public class AuthService implements IAuthService {
 
   private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
-  private static final String DEFAULT_ROLE = "USER";
-
   private final UserRepository userRepository;
   private final IOtpService otpService;
   private final IJwtService jwtService;
@@ -70,8 +68,8 @@ public class AuthService implements IAuthService {
    * <p>Returns a generic message — does not reveal whether identifier already exists (prevents user
    * enumeration).
    */
-  @Transactional
   @Override
+  @Transactional
   public void register(RegisterRequest request) {
     var type = identifierDetector.detect(request.identifier());
     var normalized = identifierDetector.normalize(request.identifier(), type);
@@ -109,8 +107,8 @@ public class AuthService implements IAuthService {
    *
    * <p>Idempotent: if already verified, returns 200 without re-issuing tokens.
    */
-  @Transactional
   @Override
+  @Transactional
   public LoginResponse verifyOtp(VerifyOtpRequest request) {
     var type = identifierDetector.detect(request.identifier());
     var normalized = identifierDetector.normalize(request.identifier(), type);
@@ -146,8 +144,8 @@ public class AuthService implements IAuthService {
    * compare when user not found to prevent user enumeration via timing differences - Generic error
    * message — does not reveal why login failed
    */
-  @Transactional
   @Override
+  @Transactional
   public LoginResponse login(LoginRequest request) {
     var type = identifierDetector.detect(request.identifier());
     var normalized = identifierDetector.normalize(request.identifier(), type);
@@ -181,16 +179,17 @@ public class AuthService implements IAuthService {
 
   // ----------------------------------------------------------------
   // Logout
-  // ----------------------------------------------------------------
 
   /**
    * Revoke the presented refresh token. Access token is short-lived (15 min) — no blocklist needed.
    */
-  @Transactional
   @Override
+  @Transactional
   public void logout(String rawRefreshToken) {
     refreshTokenService.revoke(rawRefreshToken);
   }
+
+  // ----------------------------------------------------------------
 
   // ----------------------------------------------------------------
   // Refresh
@@ -200,16 +199,19 @@ public class AuthService implements IAuthService {
    * Rotate refresh token and issue new access token. Detects token reuse and revokes all sessions
    * if detected.
    */
-  @Transactional
   @Override
+  @Transactional
   public LoginResponse refresh(String rawRefreshToken) {
     var result = refreshTokenService.rotate(rawRefreshToken);
+
     var user =
         userRepository
             .findById(result.userId())
             .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-    var accessToken = jwtService.issueAccessToken(user.getId(), user.getIdentifier(), DEFAULT_ROLE);
+    var accessToken =
+        jwtService.issueAccessToken(
+            user.getId(), user.getIdentifier(), user.getRole().name()); // ← use actual role
 
     return buildLoginResponse(accessToken, result.newRawToken());
   }
@@ -222,8 +224,8 @@ public class AuthService implements IAuthService {
    * Re-issue OTP for an unverified user. Always returns success to prevent user enumeration — even
    * if identifier does not exist.
    */
-  @Transactional
   @Override
+  @Transactional
   public void resendOtp(String rawIdentifier) {
     var type = identifierDetector.detect(rawIdentifier);
     var normalized = identifierDetector.normalize(rawIdentifier, type);
@@ -243,7 +245,11 @@ public class AuthService implements IAuthService {
   // ----------------------------------------------------------------
 
   private LoginResponse issueTokens(User user) {
-    var accessToken = jwtService.issueAccessToken(user.getId(), user.getIdentifier(), DEFAULT_ROLE);
+    var accessToken =
+        jwtService.issueAccessToken(
+            user.getId(),
+            user.getIdentifier(),
+            user.getRole().name()); // ← use actual role, not hardcoded USER
     var refreshToken = refreshTokenService.issue(user.getId());
     return buildLoginResponse(accessToken, refreshToken);
   }

@@ -13,17 +13,17 @@ INSERT INTO users (id, identifier, identifier_type, password_hash,
 VALUES
     ('00000000-0000-0000-0000-000000000001',
      'user@example.com', 'EMAIL',
-     '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/lewohgfMpU.dGEbDG',
+     '$2a$12$Q8YKH1tuEJunJ1dj2eePROkl6xlSQVeYG1tEm0ToNO7pwya/0nJsW',
      5000000.00, 'ACTIVE', TRUE),
 
     ('00000000-0000-0000-0000-000000000002',
      '0912345678', 'PHONE',
-     '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/lewohgfMpU.dGEbDG',
+     '$2a$12$Q8YKH1tuEJunJ1dj2eePROkl6xlSQVeYG1tEm0ToNO7pwya/0nJsW',
      2000000.00, 'ACTIVE', TRUE),
 
     ('00000000-0000-0000-0000-000000000003',
      'admin@example.com', 'EMAIL',
-     '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/lewohgfMpU.dGEbDG',
+     '$2a$12$Q8YKH1tuEJunJ1dj2eePROkl6xlSQVeYG1tEm0ToNO7pwya/0nJsW',
      0.00, 'ACTIVE', TRUE);
 
 -- ============================================================

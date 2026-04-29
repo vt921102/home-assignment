@@ -52,6 +52,14 @@ public class User {
   @Column(name = "is_verified", nullable = false)
   private boolean verified = false;
 
+  /**
+   * User role — determines access level. USER : regular user, can browse and purchase flash sale
+   * items. ADMIN : can manage products, sessions, inventory.
+   */
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private UserRole role = UserRole.USER;
+
   @Version private Long version;
 
   @CreationTimestamp
@@ -73,6 +81,7 @@ public class User {
     user.passwordHash = passwordHash;
     user.status = UserStatus.PENDING_VERIFICATION;
     user.verified = false;
+    user.role = UserRole.USER;
     return user;
   }
 
@@ -89,7 +98,15 @@ public class User {
     this.passwordHash = passwordHash;
   }
 
+  public void promoteToAdmin() {
+    this.role = UserRole.ADMIN;
+  }
+
   public boolean isActive() {
     return UserStatus.ACTIVE.equals(this.status) && this.verified;
+  }
+
+  public boolean isAdmin() {
+    return UserRole.ADMIN.equals(this.role);
   }
 }

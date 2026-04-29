@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
@@ -23,24 +24,19 @@ public class WebConfig implements WebMvcConfigurer {
     this.objectMapper = objectMapper;
   }
 
-  /**
-   * Register Jackson HTTP message converter using the application's configured ObjectMapper (from
-   * JacksonConfig).
-   *
-   * <p>Ensures consistent serialization behaviour between: - HTTP responses (controllers) - Redis
-   * cache (CacheConfig / RedisConfig)
-   *
-   * <p>Placed first in the converter list so Spring picks it over any auto-configured defaults.
-   */
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    // Required by springdoc-openapi for serving the OpenAPI spec file.
+    // Without this, springdoc cannot write binary responses (spec download)
+    // and Swagger UI may fail to load the spec.
+    converters.add(new ByteArrayHttpMessageConverter());
+
     var converter = new MappingJackson2HttpMessageConverter(objectMapper);
     converter.setSupportedMediaTypes(
         List.of(MediaType.APPLICATION_JSON, MediaType.APPLICATION_PROBLEM_JSON));
-    converters.add(0, converter);
+    converters.add(converter);
   }
 
-  /** Default content negotiation — always JSON unless explicitly requested otherwise. */
   @Override
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
     configurer

@@ -2,6 +2,7 @@ package com.toanlv.flashsale.common.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,32 +21,21 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
+@Order()
 public class GlobalExceptionHandler {
 
   private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-  // ----------------------------------------------------------------
-  // BusinessException — expected domain errors
-  // ----------------------------------------------------------------
-
   @ExceptionHandler(BusinessException.class)
   public ResponseEntity<ApiError> handleBusiness(BusinessException ex, HttpServletRequest request) {
-
     var error = ApiError.of(ex.getErrorCode(), ex.getMessage(), request.getRequestURI());
-
     log.debug("Business exception [{}]: {}", ex.getErrorCode(), ex.getMessage());
-
     return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(error);
   }
-
-  // ----------------------------------------------------------------
-  // Validation errors — @Valid on request body
-  // ----------------------------------------------------------------
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ApiError> handleValidation(
       MethodArgumentNotValidException ex, HttpServletRequest request) {
-
     var details =
         ex.getBindingResult().getAllErrors().stream()
             .map(
@@ -57,151 +47,90 @@ public class GlobalExceptionHandler {
                 })
             .sorted()
             .toList();
-
     var error = ApiError.withDetails(ErrorCode.VALIDATION_FAILED, request.getRequestURI(), details);
-
-    log.debug("Validation failed for [{}]: {}", request.getRequestURI(), details);
-
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
-
-  // ----------------------------------------------------------------
-  // Missing or malformed request header
-  // ----------------------------------------------------------------
 
   @ExceptionHandler(MissingRequestHeaderException.class)
   public ResponseEntity<ApiError> handleMissingHeader(
       MissingRequestHeaderException ex, HttpServletRequest request) {
-
     var error =
         ApiError.of(
             ErrorCode.VALIDATION_FAILED,
             "Required header '" + ex.getHeaderName() + "' is missing",
             request.getRequestURI());
-
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
-
-  // ----------------------------------------------------------------
-  // Unreadable request body — malformed JSON
-  // ----------------------------------------------------------------
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ApiError> handleUnreadable(
       HttpMessageNotReadableException ex, HttpServletRequest request) {
-
     var error =
         ApiError.of(
             ErrorCode.VALIDATION_FAILED,
             "Request body is malformed or missing",
             request.getRequestURI());
-
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
-
-  // ----------------------------------------------------------------
-  // Type mismatch — e.g. invalid UUID in path variable
-  // ----------------------------------------------------------------
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   public ResponseEntity<ApiError> handleTypeMismatch(
       MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
-
     var error =
         ApiError.of(
             ErrorCode.VALIDATION_FAILED,
             "Invalid value for parameter '" + ex.getName() + "'",
             request.getRequestURI());
-
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
   }
-
-  // ----------------------------------------------------------------
-  // HTTP method not supported
-  // ----------------------------------------------------------------
 
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
   public ResponseEntity<ApiError> handleMethodNotSupported(
       HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
-
     var error =
         ApiError.of(
             ErrorCode.VALIDATION_FAILED,
             "HTTP method '" + ex.getMethod() + "' is not supported",
             request.getRequestURI());
-
     return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(error);
   }
-
-  // ----------------------------------------------------------------
-  // 404 — no handler found
-  // ----------------------------------------------------------------
 
   @ExceptionHandler(NoHandlerFoundException.class)
   public ResponseEntity<ApiError> handleNotFound(
       NoHandlerFoundException ex, HttpServletRequest request) {
-
     var error = ApiError.of(ErrorCode.RESOURCE_NOT_FOUND, request.getRequestURI());
-
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
-
-  // ----------------------------------------------------------------
-  // Spring Security — authentication
-  // ----------------------------------------------------------------
 
   @ExceptionHandler(AuthenticationException.class)
   public ResponseEntity<ApiError> handleAuthentication(
       AuthenticationException ex, HttpServletRequest request) {
-
     var error = ApiError.of(ErrorCode.INVALID_CREDENTIALS, request.getRequestURI());
-
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
   }
-
-  // ----------------------------------------------------------------
-  // Spring Security — authorization
-  // ----------------------------------------------------------------
 
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ApiError> handleAccessDenied(
       AccessDeniedException ex, HttpServletRequest request) {
-
     var error = ApiError.of(ErrorCode.ACCESS_DENIED, request.getRequestURI());
-
     return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
   }
-
-  // ----------------------------------------------------------------
-  // Database integrity violation
-  // — last resort for constraint violations not caught by business logic
-  // ----------------------------------------------------------------
 
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<ApiError> handleDataIntegrity(
       DataIntegrityViolationException ex, HttpServletRequest request) {
-
     log.warn(
         "Data integrity violation at [{}]: {}",
         request.getRequestURI(),
         ex.getMostSpecificCause().getMessage());
-
     var error = ApiError.of(ErrorCode.DUPLICATE_REQUEST, request.getRequestURI());
-
     return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
   }
 
-  // ----------------------------------------------------------------
-  // Catch-all — unexpected errors
-  // ----------------------------------------------------------------
-
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiError> handleGeneral(Exception ex, HttpServletRequest request) {
-
     log.error("Unhandled exception at [{}]", request.getRequestURI(), ex);
-
     var error = ApiError.of(ErrorCode.INTERNAL_ERROR, request.getRequestURI());
-
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
   }
 }

@@ -22,6 +22,11 @@ public class OpenApiConfig {
   @Bean
   public OpenAPI openAPI() {
     return new OpenAPI()
+        // Explicitly declare OpenAPI 3.0.3 — prevents Swagger UI
+        // "does not specify a valid version field" error.
+        // springdoc 2.8.x defaults to 3.1.0 which some Swagger UI
+        // builds do not handle gracefully.
+        .openapi("3.0.3")
         .info(
             new Info()
                 .title("Flash Sale & Authentication API")
